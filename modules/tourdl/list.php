@@ -1,8 +1,7 @@
 <?php
-// modules/tourdl/list.php (Cập nhật - Thêm link "Gán Điểm Đến")
-// Tour Management Core - Dev: Khoagit add .
-git commit -m "SV4-Khoa: Xay dung module Tour va Thanh toan"
-git push -u origin sv4-khoa
+// modules/tourdl/list.php
+// Core Product Tour - Dev: Khoa
+
 $page_title = 'Danh sách Tour Du Lịch';
 $danh_sach_tour = [];
 try {
@@ -27,7 +26,7 @@ try {
 
 <div class="container">
     <a href="index.php?module=tourdl&action=add" class="btn-add">Thêm Tour Mới</a>
-    <h3>Đây là trang DANH SÁCH TOUR</h3>
+    <h3>QUẢN LÝ DANH SÁCH TOUR DU LỊCH</h3>
 
     <table border="1" style="width:100%; border-collapse: collapse; text-align: left;">
         <thead>
@@ -53,7 +52,11 @@ try {
                         <td><?php echo htmlspecialchars($tour['maTour']); ?></td>
                         <td><?php echo htmlspecialchars($tour['TenTour']); ?></td>
                         <td><?php echo htmlspecialchars($tour['ngay_khoi_hanh']); ?></td>
-                        <td><?php echo number_format($tour['gia_ban']); ?></td>
+                        
+                        <td style="color: #d9534f; font-weight: bold;">
+                            <?php echo number_format($tour['gia_ban']); ?> VNĐ
+                        </td>
+
                         <td><?php echo htmlspecialchars($tour['so_cho_toi_da']); ?></td>
                         <td><?php echo htmlspecialchars($tour['thoi_gian']); ?></td>
                         <td><?php echo htmlspecialchars($tour['mo_ta_hanh_trinh']); ?></td>
@@ -61,7 +64,6 @@ try {
                         <td style="white-space: nowrap;">
                             <a href="index.php?module=tourdl&action=edit&id=<?php echo $tour['maTour']; ?>">Sửa</a> |
                             <a href="index.php?module=tourdl&action=delete&id=<?php echo $tour['maTour']; ?>" onclick="return confirm('Bạn có chắc muốn xóa?');">Xóa</a> |
-                            
                             <a href="index.php?module=tourdl&action=assign&id=<?php echo $tour['maTour']; ?>" style="color: blue; font-weight: bold;">Gán Điểm Đến</a>
                         </td>
                     </tr>

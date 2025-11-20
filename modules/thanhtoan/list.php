@@ -1,10 +1,10 @@
 <?php
 // modules/thanhtoan/list.php
+// Payment Module - Dev: Khoa
 
 $page_title = 'Quản lý Thanh Toán';
 $ds_thanhtoan = [];
 try {
-    // JOIN với dondattour và khachhang để lấy thông tin
     $sql = "SELECT 
                 thanhtoan.*, 
                 dondattour.ma_booking,
@@ -53,7 +53,11 @@ try {
                         <td><?php echo number_format($tt['so_tien']); ?> VNĐ</td>
                         <td><?php echo htmlspecialchars($tt['ngay_thanh_toan']); ?></td>
                         <td><?php echo htmlspecialchars($tt['phuong_thuc_thanh_toan']); ?></td>
-                        <td><?php echo htmlspecialchars($tt['trang_thai']); ?></td>
+                        
+                        <td style="font-weight: bold; color: <?php echo ($tt['trang_thai'] == 'Đã thanh toán') ? 'green' : 'orange'; ?>;">
+                            <?php echo htmlspecialchars($tt['trang_thai']); ?>
+                        </td>
+
                         <td>
                             <a href="index.php?module=thanhtoan&action=edit&id=<?php echo $tt['ma_thanh_toan']; ?>">Sửa</a>
                             <a href="index.php?module=thanhtoan&action=delete&id=<?php echo $tt['ma_thanh_toan']; ?>" onclick="return confirm('Bạn có chắc muốn xóa?');">Xóa</a>
