@@ -17,7 +17,7 @@ try {
 ?>
 
 <div class="container">
-    <a href="index.php?module=hdv&action=add" class="btn-add">Thêm Hướng Dẫn Viên Mới</a>
+    <a href="..." class="btn-add" style="background: #28a745; color: white; padding: 8px 15px; text-decoration: none; border-radius: 4px;">+ Thêm HDV</a>
     
     <h3>Danh sách Hướng Dẫn Viên</h3>
 

@@ -17,7 +17,7 @@ try {
     <a href="index.php?module=khachhang&action=add" class="btn-add">Thêm Khách Hàng Mới</a>
     <h3>Danh sách Khách Hàng</h3>
 
-    <table border="1" style="width:100%; border-collapse: collapse; text-align: left;">
+    <table border="1" style="width:100%; border-collapse: collapse;text-align: center; background-color: #fff;">
         <thead>
             <tr>
                 <th>Mã KH</th>

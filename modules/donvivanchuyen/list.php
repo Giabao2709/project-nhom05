@@ -14,7 +14,7 @@ try {
 
 <div class="container">
     <a href="index.php?module=donvivanchuyen&action=add" class="btn-add">Thêm ĐV Vận Chuyển Mới</a>
-    <h3>Danh sách Đơn Vị Vận Chuyển</h3>
+    <h3>DANH SÁCH ĐỐI TÁC VẬN CHUYỂN</h3>
 
     <table border="1" style="width:100%; border-collapse: collapse; text-align: left;">
         <thead>
