@@ -1,12 +1,12 @@
+
 <?php
-// Đặt mật khẩu mới của bạn vào đây
-$mat_khau_moi = 'nhom05'; 
-
-// Mã hóa mật khẩu
-$hash = password_hash($mat_khau_moi, PASSWORD_DEFAULT);
-
-echo "Tài khoản mới: projectnhom05<br>";
-echo "Mật khẩu mới: $mat_khau_moi<br>";
-echo "Chuỗi mã hóa (Copy chuỗi này):<br>";
-echo "<textarea style='width:500px; height: 70px;'>$hash</textarea>";
+// Tool tạo mật khẩu nhanh
+$password = 'nhom05'; 
+$hash = password_hash($password, PASSWORD_DEFAULT);
 ?>
+<div style="font-family: sans-serif; padding: 20px; border: 1px solid #ccc; max-width: 600px; margin: 50px auto;">
+    <h3 style="margin-top: 0;">🔑 Công cụ mã hóa mật khẩu (BCRYPT)</h3>
+    <p>Mật khẩu gốc: <code><?php echo $password; ?></code></p>
+    <p>Chuỗi mã hóa (Copy vào Database):</p>
+    <input type="text" value="<?php echo $hash; ?>" style="width: 100%; padding: 10px; font-size: 1.1em;">
+</div>

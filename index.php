@@ -1,10 +1,13 @@
 <?php
 // index.php (File điều hướng chính - PHIÊN BẢN ĐÃ SỬA LỖI)
+// Core Router (Bộ điều hướng trung tâm) - Maintained by SV3: Bảo
 
 // Bật báo lỗi (để gỡ lỗi)
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
+// Thiết lập múi giờ chuẩn Việt Nam
+date_default_timezone_set('Asia/Ho_Chi_Minh');
 
 // 1. Tải file kết nối CSDL
 require_once 'config/db.php';
