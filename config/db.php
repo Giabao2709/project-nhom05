@@ -1,29 +1,26 @@
 <?php
-// db.php - File kết nối cơ sở dữ liệu
+/**
+ * FILE CẤU HÌNH CƠ SỞ DỮ LIỆU
+ * Người phụ trách: SV1 - Hữu Thuận
+ */
 
-$host = 'localhost';    // Thường là 'localhost'
-$dbname = 'quanlytour';     // Tên CSDL bạn đã tạo
-$username = 'root';     // Tên đăng nhập CSDL (mặc định của XAMPP)
-$password = '';         // Mật khẩu (mặc định của XAMPP là rỗng)
-$charset = 'utf8mb4';   // Hỗ trợ tiếng Việt
+$host = 'localhost';
+$dbname = 'quanlytour';     // Tên CSDL
+$username = 'root';         // User mặc định XAMPP
+$password = '';             // Pass mặc định XAMPP
+$charset = 'utf8mb4';
 
-// DSN (Data Source Name)
 $dsn = "mysql:host=$host;dbname=$dbname;charset=$charset";
+$options = [
+    PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
+    PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+    PDO::ATTR_EMULATE_PREPARES   => false,
+];
 
 try {
-    // Tạo đối tượng PDO (PHP Data Objects)
-    $pdo = new PDO($dsn, $username, $password);
-    
-    // Thiết lập chế độ báo lỗi để dễ dàng gỡ lỗi
-    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-    
-    // Bạn không cần echo ở đây, file này chỉ để kết nối
-    // echo "Kết nối thành công!"; 
-    
-} catch (PDOException $e) {
-    // Nếu kết nối thất bại, hiển thị lỗi
-    echo "Kết nối thất bại: " . $e->getMessage();
-    exit(); // Dừng chương trình
+    $pdo = new PDO($dsn, $username, $password, $options);
+} catch (\PDOException $e) {
+    // Nếu lỗi kết nối, dừng và báo lỗi
+    throw new \PDOException($e->getMessage(), (int)$e->getCode());
 }
-
 ?>
