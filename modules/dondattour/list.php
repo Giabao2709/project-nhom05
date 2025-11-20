@@ -1,4 +1,11 @@
 <?php
+/**
+ * MODULE: QUẢN LÝ ĐƠN ĐẶT TOUR (Booking)
+ * --------------------------------------
+ * Chức năng: Quản lý thông tin đặt tour của khách hàng.
+ * Liên kết bảng: dondattour -> khachhang, tourdl, khuyenmai.
+ * Reviewed by: Trương Đức Thành (SV3)
+ */
 // modules/dondattour/list.php
 
 $page_title = 'Quản lý Đơn Đặt Tour';
@@ -31,7 +38,7 @@ try {
     <table border="1" style="width:100%; border-collapse: collapse; text-align: left;">
         <thead>
             <tr>
-                <th>Mã Booking</th>
+                <th>Mã Vé (Booking ID)</th>
                 <th>Khách Hàng</th>
                 <th>Tour Đã Đặt</th>
                 <th>Ngày Đặt</th>

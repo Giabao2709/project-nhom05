@@ -1,23 +1,8 @@
 
 
 <div class="container">
-    <h3>Chào mừng bạn đến với trang quản trị!</h3>
-    <p>Vui lòng chọn một chức năng từ menu bên trái.</p>
-    
-    <ul>
-        <li><a href="index.php?module=khachhang&action=list">Quản lý Khách Hàng</a></li>
-        <li><a href="index.php?module=tourdl&action=list">Quản lý Tour Du Lịch</a></li>
-        <li><a href="index.php?module=diemden&action=list">Quản lý Điểm Đến</a></li>
-        <li><a href="index.php?module=loaitour&action=list">Quản lý Loại Tour</a></li>
-        <li><a href="index.php?module=hdv&action=list">Quản lý Hướng Dẫn Viên</a></li>
-        <li><a href="index.php?module=donvivanchuyen&action=list">Quản lý ĐV Vận Chuyển</a></li>
-        <li><a href="index.php?module=khuyenmai&action=list">Quản lý Khuyến mãi</a></li>
-        <li><a href="index.php?module=dondattour&action=list">Quản lý Đơn Đặt Tour</a></li>
-        <li><a href="index.php?module=thanhtoan&action=list">Quản lý Thanh Toán</a></li>
-        <li style="border-top: 1px solid #ccc; margin-top: 10px; padding-top: 10px;">
-                <a href="logout.php">Đăng xuất</a>
-        </li>
-    </ul>
+    <h3 style="color: #2c3e50;">👋 Chào mừng quản trị viên quay trở lại!</h3>
+<p style="color: #7f8c8d;">Hệ thống quản lý tour du lịch v1.0</p>
 </div>
 <?php
 // modules/dashboard/list.php (Trang Chủ - Bản Thống Kê)

@@ -2,7 +2,7 @@
 // modules/diemden/list.php
 
 // 1. Đặt tiêu đề cho trang
-$page_title = 'Quản lý Điểm Đến';
+$page_title = 'Quản lý Booking (Đơn Đặt Tour)';
 
 // 2. Lấy dữ liệu (DÙNG BIẾN $pdo TỪ index.php)
 $danh_sach_diemden = [];
@@ -25,7 +25,7 @@ try {
         <thead>
             <tr>
                 <th>Mã Điểm Đến</th>
-                <th>Tên Địa Danh</th>
+                <th>Tên Địa Điểm Du Lịch</th>
                 <th>Địa Chỉ</th>
                 <th>Mô Tả</th>
                 <th>Hành động</th>

@@ -1,6 +1,8 @@
 <?php
 // modules/tourdl/list.php (Cập nhật - Thêm link "Gán Điểm Đến")
-
+// Tour Management Core - Dev: Khoagit add .
+git commit -m "SV4-Khoa: Xay dung module Tour va Thanh toan"
+git push -u origin sv4-khoa
 $page_title = 'Danh sách Tour Du Lịch';
 $danh_sach_tour = [];
 try {
