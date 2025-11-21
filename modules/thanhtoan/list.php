@@ -49,8 +49,8 @@ try {
                         <td><?php echo htmlspecialchars($tt['phuong_thuc_thanh_toan']); ?></td>
                         
                         <td style="font-weight: bold; color: <?php echo ($tt['trang_thai'] == 'Đã thanh toán') ? 'green' : '#e67e22'; ?>;">
-                            <?php echo htmlspecialchars($tt['trang_thai']); ?>
-                        </td>
+    <?php echo htmlspecialchars($tt['trang_thai']); ?>
+</td>
 
                         <td>
                             <a href="index.php?module=thanhtoan&action=edit&id=<?php echo $tt['ma_thanh_toan']; ?>">Sửa</a> |

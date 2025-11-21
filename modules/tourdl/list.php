@@ -48,9 +48,9 @@ try {
                         <td><?php echo htmlspecialchars($tour['TenTour']); ?></td>
                         <td><?php echo date("d/m/Y", strtotime($tour['ngay_khoi_hanh'])); ?></td>
                         
-                        <td style="color: #dc3545; font-weight: bold;">
-                            <?php echo number_format($tour['gia_ban']); ?> VNĐ
-                        </td>
+                       <td style="color: #dc3545; font-weight: bold;">
+    <?php echo number_format($tour['gia_ban']); ?> VNĐ
+</td>
 
                         <td><?php echo htmlspecialchars($tour['so_cho_toi_da']); ?></td>
                         <td><?php echo htmlspecialchars($tour['thoi_gian']); ?></td>
