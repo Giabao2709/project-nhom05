@@ -8,7 +8,11 @@
  * Dev: SV3 - Gia Bảo
  */
 
+<<<<<<< HEAD
 session_start(); 
+=======
+session_start(); // Bắt đầu session
+>>>>>>> sv2-thanh
 require_once 'config/db.php'; // Nạp file kết nối CSDL
 
 $error = '';

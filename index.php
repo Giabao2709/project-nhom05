@@ -1,7 +1,5 @@
 <?php
 // index.php (File điều hướng chính - PHIÊN BẢN ĐÃ SỬA LỖI)
-// Core Router (Bộ điều hướng trung tâm) - Maintained 
-
 // Bật báo lỗi (để gỡ lỗi)
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
