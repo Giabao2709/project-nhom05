@@ -52,7 +52,7 @@ try {
         .btn-book { display: block; width: 100%; padding: 10px; background-color: #28a745; color: white; text-align: center; text-decoration: none; border-radius: 5px; font-weight: bold; }
         .btn-book:hover { background-color: #218838; }
 
-        /* Footer */    
+        /* Footer */
         footer { background-color: #333; color: white; text-align: center; padding: 20px 0; margin-top: 40px; }
     </style>
 </head>
@@ -65,8 +65,7 @@ try {
                 <a href="#">Trang Chủ</a>
                 <a href="#">Tour Trong Nước</a>
                 <a href="#">Tour Quốc Tế</a>
-                <a href="index.php" style="background: rgba(255,255,255,0.2); padding: 5px 10px; border-radius: 4px;">Đăng nhập Admin</a>
-            </div>
+                </div>
         </div>
     </header>
 
@@ -99,7 +98,7 @@ try {
                             
                             <span class="tour-price"><?php echo number_format($tour['gia_ban']); ?> VNĐ</span>
                             
-                            <a href="#" class="btn-book" onclick="alert('Chức năng đặt tour dành cho khách hàng sẽ được phát triển trong phiên bản 2.0!'); return false;">ĐẶT NGAY</a>
+                            <a href="#" class="btn-book" onclick="alert('Liên hệ hotline: 1900-xxxx để đặt vé!'); return false;">ĐẶT NGAY</a>
                         </div>
                     </div>
                 <?php endforeach; ?>
