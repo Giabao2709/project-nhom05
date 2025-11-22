@@ -1,11 +1,5 @@
 <?php
 // index.php (File điều hướng chính - PHIÊN BẢN ĐÃ SỬA LỖI)
-<<<<<<< HEAD
-// Core Router (Bộ điều hướng trung tâm) - Maintained 
-=======
-// Core Router (Bộ điều hướng trung tâm) - Maintained by SV3: Bảo
->>>>>>> sv2-thanh
-
 // Bật báo lỗi (để gỡ lỗi)
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
