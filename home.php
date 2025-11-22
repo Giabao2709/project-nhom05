@@ -109,7 +109,7 @@ try {
                             
                             <span class="tour-price"><?php echo number_format($tour['gia_ban']); ?> VNĐ</span>
                             
-                            <a href="booking.php?id=<?php echo $tour['maTour']; ?>" class="btn-book" onclick="return confirm('Bạn có muốn đặt tour này không?');">ĐẶT NGAY</a>
+                            <a href="confirm_booking.php?id=<?php echo $tour['maTour']; ?>" class="btn-book" onclick="return confirm('Bạn có muốn đặt tour này không?');">ĐẶT NGAY</a>
                         </div>
                     </div>
                 <?php endforeach; ?>
