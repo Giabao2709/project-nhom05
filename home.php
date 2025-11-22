@@ -1,5 +1,7 @@
 <?php
 // home.php - Trang chủ dành cho Khách hàng
+session_start(); // 1. Bắt đầu session (QUAN TRỌNG)
+
 require_once 'config/db.php';
 
 // Lấy danh sách Tour mới nhất
@@ -62,10 +64,19 @@ try {
         <div class="container navbar">
             <div class="logo">VIVU TOUR ✈️</div>
             <div class="menu">
-                <a href="#">Trang Chủ</a>
+                <a href="home.php">Trang Chủ</a>
                 <a href="#">Tour Trong Nước</a>
                 <a href="#">Tour Quốc Tế</a>
-                </div>
+                
+                <?php if (isset($_SESSION['kh_id'])): ?>
+                    <span style="margin-left: 20px; font-weight: bold;">Xin chào, <?php echo htmlspecialchars($_SESSION['kh_name']); ?></span>
+                    <a href="logout_client.php" style="background: #dc3545; padding: 5px 10px; border-radius: 4px; margin-left: 10px;">Thoát</a>
+                <?php else: ?>
+                    <a href="login_client.php" style="background: #28a745; padding: 5px 10px; border-radius: 4px; margin-left: 20px;">Đăng nhập</a>
+                    <a href="register_client.php" style="background: #17a2b8; padding: 5px 10px; border-radius: 4px; margin-left: 5px;">Đăng ký</a>
+                <?php endif; ?>
+
+            </div>
         </div>
     </header>
 
@@ -98,7 +109,7 @@ try {
                             
                             <span class="tour-price"><?php echo number_format($tour['gia_ban']); ?> VNĐ</span>
                             
-                            <a href="#" class="btn-book" onclick="alert('Liên hệ hotline: 1900-xxxx để đặt vé!'); return false;">ĐẶT NGAY</a>
+                            <a href="booking.php?id=<?php echo $tour['maTour']; ?>" class="btn-book" onclick="return confirm('Bạn có muốn đặt tour này không?');">ĐẶT NGAY</a>
                         </div>
                     </div>
                 <?php endforeach; ?>
