@@ -17,7 +17,7 @@ try {
     <h3>Danh sách Khuyến mãi</h3>
 
     <table border="1" style="width:100%; border-collapse: collapse; text-align: left;">
-        <thead>
+        <thead style="background: #007bff; color: white;">
             <tr>
                 <th>Mã KM</th>
                 <th>Giá trị (Mô tả)</th>
@@ -35,7 +35,9 @@ try {
                 <?php foreach ($ds_khuyenmai as $km): ?>
                     <tr>
                         <td><?php echo htmlspecialchars($km['ma_khuyen_mai']); ?></td>
-                        <td><?php echo htmlspecialchars($km['gia_tri']); ?></td>
+                        <td style="color: #dc3545; font-weight: bold;">
+    <?php echo htmlspecialchars($km['gia_tri']); ?>
+</td>
                         <td><?php echo htmlspecialchars($km['ngay_bat_dau']); ?></td>
                         <td><?php echo htmlspecialchars($km['ngay_ket_thuc']); ?></td>
                         <td>
