@@ -1,11 +1,10 @@
 <?php
 session_start();
+// Xóa toàn bộ session
+session_unset();
+session_destroy();
 
-// Xóa thông tin đăng nhập của khách hàng
-unset($_SESSION['kh_id']);
-unset($_SESSION['kh_name']);
-
-// Quay về trang chủ
+// Chuyển về trang chủ hoặc trang đăng nhập
 header("Location: home.php");
 exit();
 ?>
