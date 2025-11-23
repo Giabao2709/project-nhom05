@@ -1,14 +1,13 @@
 <?php
 session_start();
 
-// 1. KẾT NỐI CSDL (QUAN TRỌNG NHẤT - KHÔNG ĐƯỢC QUÊN)
+// 1. KẾT NỐI CSDL
 require_once 'config/db.php';
 
 // 2. LOGIC KIỂM TRA ĐĂNG NHẬP
 $is_logged_in = false;
 $user_name = "Khách";
 
-// Kiểm tra session khách hàng (Ưu tiên client_name, dự phòng kh_name)
 if (isset($_SESSION['client_name']) && !empty($_SESSION['client_name'])) {
     $is_logged_in = true;
     $user_name = $_SESSION['client_name'];
@@ -22,8 +21,8 @@ $tours = [];
 $error_db = "";
 
 try {
-    // Lấy 6 tour mới nhất để hiển thị
-    $sql = "SELECT * FROM tourdl ORDER BY id DESC LIMIT 6";
+    // --- SỬA LỖI Ở ĐÂY: Thay 'id' thành 'maTour' ---
+    $sql = "SELECT * FROM tourdl ORDER BY maTour DESC LIMIT 6";
     $stmt = $pdo->query($sql);
     $tours = $stmt->fetchAll(PDO::FETCH_ASSOC);
 } catch (PDOException $e) {
@@ -36,13 +35,11 @@ try {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Vivu Vietnam - Trải nghiệm sự khác biệt</title>
-    <!-- Font chữ & Icon -->
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <!-- CSS Chính -->
     <link rel="stylesheet" href="layouts/client_style.css">
     
-    <!-- CSS RIÊNG CHO MODAL ĐĂNG NHẬP -->
+    <!-- CSS MODAL ĐĂNG NHẬP -->
     <style>
         .modal-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
@@ -138,7 +135,8 @@ try {
                     <div class="tour-card">
                         <div class="card-header">
                             <?php 
-                                // Xử lý ảnh (ưu tiên ảnh thật, nếu không có thì dùng ảnh mẫu)
+                                // --- CẬP NHẬT TÊN CỘT THEO CSDL CỦA BẠN ---
+                                // Ảnh -> hinh_anh (nếu cột khác hãy sửa ở đây)
                                 $hinh = "https://source.unsplash.com/random/400x300/?travel"; 
                                 if (!empty($tour['hinh_anh']) && file_exists("uploads/".$tour['hinh_anh'])) {
                                     $hinh = "uploads/".$tour['hinh_anh'];
@@ -148,12 +146,15 @@ try {
                             <span class="badge-hot">HOT</span>
                         </div>
                         <div class="card-body">
-                            <h3 class="tour-title"><?php echo htmlspecialchars($tour['ten_tour']); ?></h3>
+                            <!-- Tên Tour -> TenTour -->
+                            <h3 class="tour-title"><?php echo htmlspecialchars($tour['TenTour']); ?></h3>
                             <div class="card-footer">
                                 <div class="price">
-                                    <?php echo number_format($tour['gia'], 0, ',', '.'); ?> ₫
+                                    <!-- Giá -> gia_ban -->
+                                    <?php echo number_format($tour['gia_ban'], 0, ',', '.'); ?> ₫
                                 </div>
-                                <a href="booking.php?id=<?php echo $tour['id']; ?>" class="btn-book">Chi tiết</a>
+                                <!-- ID -> maTour -->
+                                <a href="booking.php?id=<?php echo $tour['maTour']; ?>" class="btn-book">Chi tiết</a>
                             </div>
                         </div>
                     </div>
@@ -168,24 +169,21 @@ try {
         </div>
     </div>
 
-    <!-- POPUP ĐĂNG NHẬP (MODAL) -->
+    <!-- POPUP ĐĂNG NHẬP -->
     <div class="modal-overlay" id="loginModal">
         <div class="login-popup">
             <span class="close-btn" onclick="closeLogin()">&times;</span>
             <h2>Khách Hàng Đăng Nhập</h2>
-            
             <div id="loginError" class="error-msg">Email hoặc mật khẩu không chính xác!</div>
-
             <form action="login_client.php" method="POST">
                 <div class="input-group">
-                    <input type="email" name="email" placeholder="Nhập Email (Ví dụ: khoa@gmail.com)" required>
+                    <input type="email" name="email" placeholder="Nhập Email" required>
                 </div>
                 <div class="input-group">
                     <input type="password" name="password" placeholder="Mật khẩu" required>
                 </div>
                 <button type="submit" class="btn-submit">Đăng Nhập</button>
             </form>
-            
             <p style="margin-top: 20px; font-size: 0.9rem;">
                 Chưa có tài khoản? <a href="register_client.php" style="color: #0ea5e9;">Đăng ký ngay</a>
             </p>
