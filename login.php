@@ -8,12 +8,8 @@
  * Dev: SV3 - Gia Bảo
  */
 
-<<<<<<< HEAD
-session_start(); 
-=======
 session_start(); // Bắt đầu session
->>>>>>> sv2-thanh
-require_once 'config/db.php'; // Nạp file kết nối CSDL
+require_once 'config/db.php'; // Nạp file kết nối CSDL (phải tạo $pdo trong file này)
 
 $error = '';
 
@@ -25,36 +21,42 @@ if (isset($_SESSION['user_id'])) {
 
 // Xử lý khi người dùng nhấn nút "Đăng nhập"
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    // SV3: Dùng trim() để loại bỏ khoảng trắng thừa
-    $ten_dang_nhap = trim($_POST['ten_dang_nhap']);
-    $mat_khau = trim($_POST['mat_khau']);
+    // Dùng null-coalescing để tránh undefined index
+    $ten_dang_nhap = trim($_POST['ten_dang_nhap'] ?? '');
+    $mat_khau = trim($_POST['mat_khau'] ?? '');
 
-    if (empty($ten_dang_nhap) || empty($mat_khau)) {
+    if ($ten_dang_nhap === '' || $mat_khau === '') {
         $error = "Vui lòng nhập đầy đủ tên đăng nhập và mật khẩu.";
     } else {
         try {
-            // Tìm người dùng trong CSDL
-            $sql = "SELECT * FROM quantrivien WHERE ten_dang_nhap = ?";
+            // Tìm người dùng trong CSDL (prepared statement đã chống SQL injection)
+            $sql = "SELECT * FROM quantrivien WHERE ten_dang_nhap = ? LIMIT 1";
             $stmt = $pdo->prepare($sql);
             $stmt->execute([$ten_dang_nhap]);
             $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
-            // Kiểm tra mật khẩu
+            // Kiểm tra mật khẩu (giả sử mat_khau trong DB là password_hash)
             if ($user && password_verify($mat_khau, $user['mat_khau'])) {
-                // Đăng nhập thành công, lưu thông tin vào Session
+                // Đăng nhập thành công, tái tạo session id để an toàn hơn
+                session_regenerate_id(true);
                 $_SESSION['user_id'] = $user['id'];
-                $_SESSION['user_name'] = $user['ho_ten'];
-                
+                $_SESSION['user_name'] = $user['ho_ten'] ?? $user['ten_dang_nhap'];
+
                 // Chuyển hướng đến trang quản trị
                 header("Location: index.php");
                 exit();
             } else {
-                // SV3: Cập nhật thông báo lỗi chi tiết hơn
+                // Thông báo lỗi chung (không bật chi tiết user tồn tại hay không)
                 $error = "Cảnh báo: Thông tin đăng nhập không đúng. Vui lòng kiểm tra lại!";
             }
 
         } catch (PDOException $e) {
-            $error = "Lỗi Hệ Thống: " . $e->getMessage();
+            // Tránh hiện thông tin nội bộ cho người dùng (dev có thể log)
+            // Nhưng để tiện debug bạn có thể bật dòng dưới (không khuyến nghị trên production)
+            // $error = "Lỗi Hệ Thống: " . $e->getMessage();
+            $error = "Lỗi Hệ Thống: Vui lòng thử lại sau hoặc liên hệ quản trị.";
+            // Log lỗi thực tế ở server (ví dụ lỗi vào file log) - không hiển thị cho user
+            error_log("Database error on login: " . $e->getMessage());
         }
     }
 }
@@ -83,13 +85,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         <h2>ĐĂNG NHẬP</h2>
         
         <?php if (!empty($error)): ?>
-            <div class="error">⚠️ <?php echo $error; ?></div>
+            <div class="error">⚠️ <?php echo htmlspecialchars($error, ENT_QUOTES, 'UTF-8'); ?></div>
         <?php endif; ?>
 
-        <form action="login.php" method="POST">
+        <form action="<?php echo htmlspecialchars($_SERVER['PHP_SELF'], ENT_QUOTES, 'UTF-8'); ?>" method="POST" autocomplete="off">
             <div>
                 <label for="ten_dang_nhap">Tên tài khoản</label>
-                <input type="text" id="ten_dang_nhap" name="ten_dang_nhap" required placeholder="Nhập tài khoản admin...">
+                <input type="text" id="ten_dang_nhap" name="ten_dang_nhap" required placeholder="Nhập tài khoản admin..." value="<?php echo isset($ten_dang_nhap) ? htmlspecialchars($ten_dang_nhap, ENT_QUOTES, 'UTF-8') : ''; ?>">
             </div>
             <div>
                 <label for="mat_khau">Mật khẩu</label>
