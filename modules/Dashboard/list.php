@@ -1,73 +1,100 @@
 <?php
-// modules/dashboard/list.php
-// Module Dashboard - Dev: Thanh (UI Update) - Merged by SV3
+$page_title = 'Tổng Quan Hệ Thống';
 
-$page_title = 'Bảng Điều Khiển';
-
-// Khởi tạo biến thống kê (Tránh lỗi undefined variable)
-$total_tours = 0;
-$total_khachhang = 0;
-$total_dondat = 0;
-$total_hdv = 0;
-
+// Lấy số liệu
 try {
-    // Truy vấn dữ liệu thống kê nhanh
-    $total_tours = $pdo->query("SELECT COUNT(*) FROM tourdl")->fetchColumn();
-    $total_khachhang = $pdo->query("SELECT COUNT(*) FROM khachhang")->fetchColumn();
-    $total_dondat = $pdo->query("SELECT COUNT(*) FROM dondattour")->fetchColumn();
-    $total_hdv = $pdo->query("SELECT COUNT(*) FROM hdv")->fetchColumn();
+    $total_tours       = $pdo->query("SELECT COUNT(*) FROM tourdl")->fetchColumn();
+    $total_khachhang   = $pdo->query("SELECT COUNT(*) FROM khachhang")->fetchColumn();
+    $total_dondat      = $pdo->query("SELECT COUNT(*) FROM dondattour")->fetchColumn();
+    $total_doanhthu    = $pdo->query("SELECT IFNULL(SUM(so_tien), 0) FROM thanhtoan WHERE trang_thai = 'Đã thanh toán'")->fetchColumn();
 } catch (PDOException $e) {
-    echo "Lỗi: " . $e->getMessage();
+    echo "Lỗi truy vấn: " . $e->getMessage();
 }
 ?>
 
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
 <style>
-    .welcome-box {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        color: white;
-        padding: 30px;
-        border-radius: 10px;
-        margin-bottom: 30px;
-        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    .dashboard-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+        gap: 20px;
+        margin-top: 20px;
     }
-    .stat-container { display: flex; gap: 20px; flex-wrap: wrap; }
-    .stat-box {
-        flex: 1;
+    .card {
         background: #fff;
+        border-radius: 12px;
         padding: 20px;
-        border-radius: 8px;
-        border-left: 5px solid #007bff;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-        text-align: center;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        transition: 0.25s ease;
     }
-    .stat-box h2 { margin: 0; font-size: 2.5em; color: #333; }
-    .stat-box p { margin: 5px 0 0; color: #666; font-weight: bold; text-transform: uppercase; font-size: 0.9em;}
+    .card:hover {
+        transform: translateY(-6px);
+        box-shadow: 0 8px 20px rgba(0,0,0,0.12);
+    }
+    .card-info h3 {
+        font-size: 2.4em;
+        margin: 0;
+        color: #333;
+    }
+    .card-info p {
+        margin: 6px 0 0;
+        color: #555;
+        font-weight: 600;
+        font-size: 1.05em;
+    }
+    .card-icon {
+        font-size: 3.3em;
+        opacity: 0.15;
+    }
+    .c-blue { color: #007bff; }
+    .c-green { color: #28a745; }
+    .c-orange { color: #ffc107; }
+    .c-red { color: #dc3545; }
 </style>
 
 <div class="container">
-    <!-- Phần chào mừng -->
-    <div class="welcome-box">
-        <h2 style="margin-top: 0;">👋 Xin chào, Quản Trị Viên!</h2>
-        <p>Chúc bạn một ngày làm việc hiệu quả. Hôm nay là: <strong><?php echo date('d/m/Y'); ?></strong></p>
-    </div>
+    <h2 style="border-left: 5px solid #007bff; padding-left: 15px; color: #444; margin-top:10px;">
+        👋 Xin chào, Admin!
+    </h2>
+    <p>Báo cáo tổng quan ngày: <strong><?php echo date('d/m/Y'); ?></strong></p>
 
-    <!-- Phần thống kê -->
-    <div class="stat-container">
-        <div class="stat-box" style="border-color: #007bff;">
-            <h2><?php echo $total_tours; ?></h2>
-            <p>Tour Du Lịch</p>
+    <div class="dashboard-grid">
+
+        <div class="card" style="border-bottom: 4px solid #007bff;">
+            <div class="card-info">
+                <h3><?php echo $total_tours; ?></h3>
+                <p>Tổng Tour Du Lịch</p>
+            </div>
+            <div class="card-icon c-blue"><i class="fas fa-plane-departure"></i></div>
         </div>
-        <div class="stat-box" style="border-color: #28a745;">
-            <h2><?php echo $total_khachhang; ?></h2>
-            <p>Khách Hàng</p>
+
+        <div class="card" style="border-bottom: 4px solid #28a745;">
+            <div class="card-info">
+                <h3><?php echo $total_khachhang; ?></h3>
+                <p>Khách Hàng</p>
+            </div>
+            <div class="card-icon c-green"><i class="fas fa-users"></i></div>
         </div>
-        <div class="stat-box" style="border-color: #ffc107;">
-            <h2><?php echo $total_dondat; ?></h2>
-            <p>Đơn Đặt Tour</p>
+
+        <div class="card" style="border-bottom: 4px solid #ffc107;">
+            <div class="card-info">
+                <h3><?php echo $total_dondat; ?></h3>
+                <p>Đơn Đặt Tour</p>
+            </div>
+            <div class="card-icon c-orange"><i class="fas fa-shopping-cart"></i></div>
         </div>
-        <div class="stat-box" style="border-color: #dc3545;">
-            <h2><?php echo $total_hdv; ?></h2>
-            <p>Hướng Dẫn Viên</p>
+
+        <div class="card" style="border-bottom: 4px solid #dc3545;">
+            <div class="card-info">
+                <h3 style="font-size: 1.9em;"><?php echo number_format($total_doanhthu); ?>₫</h3>
+                <p>Doanh Thu</p>
+            </div>
+            <div class="card-icon c-red"><i class="fas fa-money-bill-wave"></i></div>
         </div>
+
     </div>
 </div>
