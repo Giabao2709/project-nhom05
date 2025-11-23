@@ -26,13 +26,29 @@ ul {
 .sidebar {
     width: 260px;
     background: linear-gradient(180deg, #2c3e50 0%, #34495e 100%); /* Gradient sang trọng */
-    min-height: 100vh;
+    height: 100vh; /* Chiều cao cố định bằng màn hình */
     position: fixed;
     top: 0;
     left: 0;
     z-index: 1000;
     box-shadow: 4px 0 10px rgba(0, 0, 0, 0.1);
     padding-top: 0;
+    overflow-y: auto; /* QUAN TRỌNG: Cho phép cuộn dọc khi menu dài */
+}
+
+/* Tùy chỉnh thanh cuộn cho Sidebar (đẹp hơn thanh mặc định) */
+.sidebar::-webkit-scrollbar {
+    width: 6px;
+}
+.sidebar::-webkit-scrollbar-track {
+    background: transparent;
+}
+.sidebar::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 3px;
+}
+.sidebar::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.4);
 }
 
 .sidebar-header {
@@ -40,6 +56,9 @@ ul {
     padding: 20px;
     text-align: center;
     border-bottom: 1px solid #3e5268;
+    position: sticky; /* Giữ tiêu đề menu luôn ở trên cùng khi cuộn */
+    top: 0;
+    z-index: 10;
 }
 
 .sidebar-header h3 {
