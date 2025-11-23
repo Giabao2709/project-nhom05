@@ -1,0 +1,263 @@
+/* ==================== CLIENT GLOBAL ==================== */
+:root {
+    --primary-color: #007bff;
+    --secondary-color: #ff6b6b;
+    --text-dark: #333;
+    --text-light: #666;
+    --bg-light: #f8f9fa;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: var(--bg-light);
+    color: var(--text-dark);
+    margin: 0;
+    padding: 0;
+}
+
+/* ==================== NAVBAR ==================== */
+nav {
+    background: #fff;
+    padding: 15px 5%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+nav .logo {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: var(--primary-color);
+}
+
+nav .menu a {
+    margin-left: 20px;
+    color: #555;
+    font-weight: 500;
+    transition: 0.3s;
+}
+
+nav .menu a:hover {
+    color: var(--primary-color);
+}
+
+.btn-login {
+    background: var(--primary-color);
+    color: white !important;
+    padding: 8px 20px;
+    border-radius: 20px;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+/* ==================== HERO SECTION (BANNER) ==================== */
+.hero-banner {
+    background: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.5)), url('https://images.unsplash.com/photo-1528127269322-539801943592?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80');
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+    height: 600px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    color: white;
+    position: relative;
+}
+
+.hero-content h1 {
+    font-size: 3.5rem;
+    font-weight: 800;
+    margin-bottom: 15px;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
+.hero-content p {
+    font-size: 1.2rem;
+    margin-bottom: 30px;
+    font-weight: 500;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+}
+
+.btn-explore {
+    background: var(--secondary-color);
+    color: white;
+    padding: 12px 35px;
+    border-radius: 50px;
+    font-weight: bold;
+    font-size: 1.1rem;
+    text-transform: uppercase;
+    transition: 0.3s;
+    display: inline-block;
+    border: none;
+    box-shadow: 0 4px 15px rgba(255, 107, 107, 0.4);
+}
+
+.btn-explore:hover {
+    background: #ff5252;
+    transform: translateY(-3px);
+    box-shadow: 0 6px 20px rgba(255, 107, 107, 0.6);
+}
+
+/* ==================== SECTION TITLE ==================== */
+.section-title {
+    text-align: center;
+    margin: 60px 0 40px;
+    position: relative;
+}
+
+.section-title h2 {
+    font-size: 2.2rem;
+    color: var(--primary-color);
+    font-weight: 700;
+    text-transform: uppercase;
+    display: inline-block;
+    padding-bottom: 15px;
+    position: relative;
+}
+
+.section-title h2::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 80px;
+    height: 4px;
+    background: var(--secondary-color);
+    border-radius: 2px;
+}
+
+/* ==================== TOUR GRID ==================== */
+.tour-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 30px;
+    padding-bottom: 60px;
+}
+
+.tour-card {
+    background: white;
+    border-radius: 15px;
+    overflow: hidden;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+    transition: 0.3s;
+    display: flex;
+    flex-direction: column;
+}
+
+.tour-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 15px 30px rgba(0,0,0,0.15);
+}
+
+.tour-img {
+    height: 200px;
+    overflow: hidden;
+    position: relative;
+}
+
+.tour-img img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: 0.5s;
+}
+
+.tour-card:hover .tour-img img {
+    transform: scale(1.1);
+}
+
+.tour-price-badge {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background: var(--secondary-color);
+    color: white;
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-weight: bold;
+    font-size: 0.9rem;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
+
+.tour-content {
+    padding: 20px;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.tour-title {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: #2c3e50;
+    margin-bottom: 10px;
+    line-height: 1.4;
+}
+
+.tour-info {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.9rem;
+    color: #7f8c8d;
+    margin-bottom: 15px;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 15px;
+}
+
+.tour-info i {
+    color: var(--primary-color);
+    margin-right: 5px;
+}
+
+.tour-price {
+    font-size: 1.3rem;
+    font-weight: 800;
+    color: var(--secondary-color);
+}
+
+.btn-book {
+    display: block;
+    width: 100%;
+    text-align: center;
+    background: var(--primary-color);
+    color: white;
+    padding: 10px;
+    border-radius: 8px;
+    font-weight: 600;
+    margin-top: 10px;
+    transition: 0.3s;
+}
+
+.btn-book:hover {
+    background: #0056b3;
+    color: white;
+}
+
+/* ==================== FOOTER ==================== */
+.client-footer {
+    background: #2c3e50;
+    color: white;
+    text-align: center;
+    padding: 30px 0;
+    margin-top: 50px;
+}
+
+/* ==================== RESPONSIVE ==================== */
+@media screen and (max-width: 768px) {
+    .hero-banner { height: 400px; }
+    .tour-container { grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); }
+    .hero-content h1 { font-size: 2.5rem; }
+    .hero-content p { font-size: 1rem; }
+}
