@@ -2,95 +2,118 @@
 session_start();
 require_once 'config/db.php';
 
-if (!isset($_SESSION['kh_id'])) { header("Location: login_client.php"); exit(); }
+// 1. KIỂM TRA ĐĂNG NHẬP
+// Nếu chưa có session kh_id (chưa đăng nhập) thì đá về trang chủ hoặc hiện thông báo
+if (!isset($_SESSION['kh_id'])) {
+    echo "<script>
+            alert('Vui lòng đăng nhập để đặt tour!');
+            window.location.href = 'home.php';
+          </script>";
+    exit();
+}
 
-$ma_tour = $_GET['id'] ?? 0;
-try {
-    $stmt = $pdo->prepare("SELECT * FROM tourdl WHERE maTour = ?");
-    $stmt->execute([$ma_tour]);
-    $tour = $stmt->fetch(PDO::FETCH_ASSOC);
-    if (!$tour) die("Tour không tồn tại!");
-
-    // Lấy khuyến mãi có phan_tram > 0
-    $today = date('Y-m-d');
-    $stmt_km = $pdo->prepare("SELECT * FROM khuyenmai WHERE ngay_bat_dau <= ? AND ngay_ket_thuc >= ? AND phan_tram > 0");
-    $stmt_km->execute([$today, $today]);
-    $coupons = $stmt_km->fetchAll(PDO::FETCH_ASSOC);
-} catch (PDOException $e) { die("Lỗi: " . $e->getMessage()); }
-?>
-
-<!DOCTYPE html>
-<html lang="vi">
-<head>
-    <meta charset="UTF-8">
-    <title>Xác Nhận Thanh Toán</title>
-    <style>
-        body { font-family: sans-serif; background: #f4f4f4; display: flex; justify-content: center; align-items: center; height: 100vh; }
-        .box { background: white; padding: 30px; border-radius: 8px; width: 400px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
-        .row { display: flex; justify-content: space-between; margin: 10px 0; }
-        .total { font-size: 1.2em; font-weight: bold; color: #d9534f; border-top: 1px solid #ddd; padding-top: 10px; margin-top: 10px; }
-        button { width: 100%; padding: 12px; background: #28a745; color: white; border: none; font-weight: bold; cursor: pointer; margin-top: 15px; }
-    </style>
-</head>
-<body>
-
-<div class="box">
-    <h2 style="text-align: center; color: #007bff;">XÁC NHẬN THANH TOÁN</h2>
-    <h3><?php echo htmlspecialchars($tour['TenTour']); ?></h3>
+// 2. KIỂM TRA DỮ LIỆU POST TỪ FORM
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
     
-    <form action="booking.php" method="POST">
-        <input type="hidden" name="ma_tour" value="<?php echo $tour['maTour']; ?>">
+    $ma_khach = $_SESSION['kh_id'];
+    
+    // Lấy dữ liệu từ input của form (tên input phải khớp với bên home.php)
+    $ma_tour = isset($_POST['id']) ? $_POST['id'] : null;           // Bên home là name="id"
+    $ma_khuyen_mai = isset($_POST['ma_khuyen_mai']) ? $_POST['ma_khuyen_mai'] : null;
+    $payment_code = isset($_POST['payment']) ? $_POST['payment'] : 'tien_mat'; // Bên home là name="payment"
 
-        <div class="row">
-            <span>Giá vé:</span>
-            <span><?php echo number_format($tour['gia_ban']); ?> VNĐ</span>
-        </div>
-
-        <label>🎫 Mã Giảm Giá:</label>
-        <select name="ma_khuyen_mai" id="voucher" onchange="tinhTien()" style="width: 100%; padding: 8px; margin-top: 5px;">
-            <option value="0" data-percent="0">-- Không áp dụng --</option>
-            <?php foreach ($coupons as $km): ?>
-                <option value="<?php echo $km['ma_khuyen_mai']; ?>" data-percent="<?php echo $km['phan_tram']; ?>">
-                    <?php echo htmlspecialchars($km['gia_tri']); ?> (Giảm <?php echo $km['phan_tram']; ?>%)
-                </option>
-            <?php endforeach; ?>
-        </select>
-
-        <div class="row" style="color: green;">
-            <span>Được giảm:</span>
-            <span id="giam_gia">- 0 VNĐ</span>
-        </div>
-
-        <div class="row total">
-            <span>TỔNG CỘNG:</span>
-            <span id="tong_tien"><?php echo number_format($tour['gia_ban']); ?> VNĐ</span>
-        </div>
-
-        <hr>
-        <label>💳 Phương thức thanh toán:</label>
-        <div style="margin-top: 5px;">
-            <label><input type="radio" name="phuong_thuc" value="Tiền mặt" checked> Tiền mặt</label><br>
-            <label><input type="radio" name="phuong_thuc" value="Chuyển khoản"> Chuyển khoản</label>
-        </div>
-
-        <button type="submit">XÁC NHẬN ĐẶT VÉ</button>
-        <p style="text-align: center;"><a href="home.php">Hủy bỏ</a></p>
-    </form>
-</div>
-
-<script>
-    function tinhTien() {
-        var giaGoc = <?php echo $tour['gia_ban']; ?>;
-        var select = document.getElementById("voucher");
-        var percent = select.options[select.selectedIndex].getAttribute("data-percent");
-        
-        var soTienGiam = giaGoc * (percent / 100);
-        var tongTien = giaGoc - soTienGiam;
-
-        document.getElementById("giam_gia").innerText = "- " + new Intl.NumberFormat('vi-VN').format(soTienGiam) + " VNĐ";
-        document.getElementById("tong_tien").innerText = new Intl.NumberFormat('vi-VN').format(tongTien) + " VNĐ";
+    if (!$ma_tour) {
+        die("Lỗi: Không tìm thấy thông tin tour!");
     }
-</script>
 
-</body>
-</html>
+    // Xử lý mapping tên phương thức thanh toán cho đẹp (để lưu vào DB)
+    $phuong_thuc = 'Tiền mặt';
+    if ($payment_code == 'chuyen_khoan') {
+        $phuong_thuc = 'Chuyển khoản';
+    }
+
+    try {
+        // --- BƯỚC 1: LẤY GIÁ GỐC TỪ DB (Bảo mật, không tin giá từ client) ---
+        $stmt = $pdo->prepare("SELECT gia_ban FROM tourdl WHERE maTour = ?");
+        $stmt->execute([$ma_tour]);
+        $tour = $stmt->fetch();
+        
+        if (!$tour) { die("Lỗi: Tour không tồn tại trong hệ thống."); }
+
+        $gia_goc = $tour['gia_ban'];
+        $gia_final = $gia_goc; 
+
+        // --- BƯỚC 2: TÍNH TOÁN GIẢM GIÁ (Server Side) ---
+        // Phải tính lại trên server để đảm bảo user không sửa code HTML gian lận giá
+        if (!empty($ma_khuyen_mai)) {
+            $stmt_km = $pdo->prepare("SELECT phan_tram FROM khuyenmai WHERE ma_khuyen_mai = ?");
+            $stmt_km->execute([$ma_khuyen_mai]);
+            $km = $stmt_km->fetch();
+            
+            if ($km) {
+                $phan_tram = intval($km['phan_tram']);
+                $so_tien_giam = $gia_goc * ($phan_tram / 100);
+                $gia_final = $gia_goc - $so_tien_giam;
+            } else {
+                // Nếu mã không hợp lệ (hack), reset về null
+                $ma_khuyen_mai = null; 
+            }
+        } else {
+            $ma_khuyen_mai = null; // Đảm bảo null nếu rỗng
+        }
+
+        // --- BƯỚC 3: XÁC ĐỊNH TRẠNG THÁI THANH TOÁN ---
+        $trang_thai_thanh_toan = 'Chưa thanh toán';
+        $ngay_thanh_toan = null; 
+
+        if ($phuong_thuc == 'Chuyển khoản') {
+            // Giả định chọn chuyển khoản là đã thanh toán (hoặc bạn có thể để 'Chờ duyệt')
+            $trang_thai_thanh_toan = 'Đã thanh toán'; 
+            $ngay_thanh_toan = date('Y-m-d H:i:s'); 
+        } 
+
+        // --- BƯỚC 4: INSERT VÀO BẢNG dondattour ---
+        $pdo->beginTransaction(); // Dùng transaction để đảm bảo toàn vẹn dữ liệu
+
+        $sql_booking = "INSERT INTO dondattour (ma_khach_hang, ma_tour, ma_khuyen_mai, ngay_dat, trang_thai_don_hang) 
+                        VALUES (?, ?, ?, NOW(), 'Mới')";
+        $stmt_book = $pdo->prepare($sql_booking);
+        $stmt_book->execute([$ma_khach, $ma_tour, $ma_khuyen_mai]);
+        
+        $ma_booking_moi = $pdo->lastInsertId();
+
+        // --- BƯỚC 5: INSERT VÀO BẢNG thanhtoan ---
+        $sql_pay = "INSERT INTO thanhtoan (ma_booking, so_tien, trang_thai, phuong_thuc_thanh_toan, ngay_thanh_toan) 
+                    VALUES (?, ?, ?, ?, ?)";
+        $stmt_pay = $pdo->prepare($sql_pay);
+        $stmt_pay->execute([
+            $ma_booking_moi, 
+            $gia_final, 
+            $trang_thai_thanh_toan, 
+            $phuong_thuc,
+            $ngay_thanh_toan
+        ]);
+
+        $pdo->commit(); // Xác nhận lưu
+
+        // --- BƯỚC 6: THÔNG BÁO THÀNH CÔNG ---
+        $msg = "ĐẶT TOUR THÀNH CÔNG!\\n";
+        $msg .= "Mã đơn: #$ma_booking_moi\\n";
+        $msg .= "Thanh toán: " . number_format($gia_final, 0, ',', '.') . " VNĐ";
+
+        echo "<script>
+                alert('$msg');
+                window.location.href = 'home.php';
+              </script>";
+
+    } catch (PDOException $e) {
+        $pdo->rollBack(); // Nếu lỗi thì hoàn tác
+        echo "Lỗi hệ thống: " . $e->getMessage();
+    }
+
+} else {
+    // Nếu ai đó cố tình truy cập file này mà không qua form POST
+    header("Location: home.php");
+    exit();
+}
+?>
