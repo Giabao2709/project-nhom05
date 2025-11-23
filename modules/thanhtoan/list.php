@@ -29,7 +29,7 @@ try {
     <h3>DANH SÁCH GIAO DỊCH</h3>
 
     <table border="1" style="width:100%; border-collapse: collapse; text-align: left;">
-        <thead style="background-color: #f8f9fa;">
+        <thead style="background-color: #c42c9bff;">
             <tr>
                 <th>Mã TT</th>
                 <th>Mã Booking</th>

@@ -21,7 +21,7 @@ try {
     <h3>DANH MỤC LOẠI TOUR</h3>
 
     <table border="1" style="width:100%; border-collapse: collapse; text-align: left;">
-        <thead style="background-color: #f8f9fa;">
+        <thead style="background-color: #3eca74ff;">
             <tr>
                 <th>Mã Loại</th>
                 <th>Tên Loại Tour</th>

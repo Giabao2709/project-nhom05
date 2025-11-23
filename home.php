@@ -21,12 +21,10 @@ try {
     $tours = $stmt->fetchAll(PDO::FETCH_ASSOC);
 } catch (PDOException $e) { $tours = []; }
 
-// 2. LẤY DANH SÁCH KHUYẾN MÃI (Chỉ lấy mã còn hạn sử dụng)
+// 2. LẤY DANH SÁCH KHUYẾN MÃI (Cho Modal)
 $promotions = [];
 try {
-    // Lấy ngày hiện tại
     $currentDate = date('Y-m-d');
-    // Query: Lấy mã có ngày kết thúc >= ngày hiện tại
     $sql_km = "SELECT * FROM khuyenmai WHERE ngay_ket_thuc >= '$currentDate'";
     $stmt_km = $pdo->query($sql_km);
     $promotions = $stmt_km->fetchAll(PDO::FETCH_ASSOC);
@@ -44,6 +42,23 @@ try {
     
     <style>
         .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 2000; justify-content: center; align-items: center; backdrop-filter: blur(5px); }
+        
+        /* --- ĐOẠN CODE SỬA LỖI MENU CHE BANNER --- */
+        /* 1. Đảm bảo Navbar luôn nổi và cố định ở trên cùng */
+        .navbar {
+            position: fixed;
+            top: 0; 
+            left: 0; 
+            width: 100%;
+            z-index: 1000;
+            background-color: #1a252f; /* Màu nền tối để che nội dung khi cuộn */
+        }
+
+        /* 2. Đẩy Banner xuống một đoạn bằng chiều cao của Menu (khoảng 70-80px) */
+        .hero-banner {
+            margin-top: 80px !important; /* Dùng !important để chắc chắn áp dụng */
+        }
+        /* ------------------------------------------- */
     </style>
 </head>
 <body>
@@ -134,14 +149,12 @@ try {
             <div class="booking-body">
                 <form action="confirm_booking.php" method="POST">
                     <input type="hidden" name="id" id="modal_tour_id">
-                    
                     <input type="hidden" name="ma_khuyen_mai" id="hidden_ma_khuyen_mai" value="">
 
                     <div class="tour-summary">
-                        <div class="tour-name" id="modal_tour_name">Tên Tour Loading...</div>
+                        <div class="tour-name" id="modal_tour_name">Loading...</div>
                         <div class="summary-row">
-                            <span>Giá vé:</span>
-                            <span id="modal_tour_price">0 VNĐ</span>
+                            <span>Giá vé:</span> <span id="modal_tour_price">0 VNĐ</span>
                         </div>
                     </div>
 
@@ -160,23 +173,17 @@ try {
                     </div>
 
                     <div class="summary-row" style="color: green;">
-                        <span>Được giảm:</span>
-                        <span id="discount_amount">- 0 VNĐ</span>
+                        <span>Được giảm:</span> <span id="discount_amount">- 0 VNĐ</span>
                     </div>
 
                     <div class="total-row">
-                        <span>TỔNG CỘNG:</span>
-                        <span id="modal_tour_total">0 VNĐ</span>
+                        <span>TỔNG CỘNG:</span> <span id="modal_tour_total">0 VNĐ</span>
                     </div>
 
                     <div class="payment-methods">
                         <label style="display:block; margin: 15px 0 10px; font-weight:600;">💳 Phương thức thanh toán:</label>
-                        <label class="payment-option">
-                            <input type="radio" name="payment" value="tien_mat" checked> Tiền mặt
-                        </label>
-                        <label class="payment-option">
-                            <input type="radio" name="payment" value="chuyen_khoan"> Chuyển khoản
-                        </label>
+                        <label class="payment-option"><input type="radio" name="payment" value="tien_mat" checked> Tiền mặt</label>
+                        <label class="payment-option"><input type="radio" name="payment" value="chuyen_khoan"> Chuyển khoản</label>
                     </div>
 
                     <button type="submit" class="btn-confirm">XÁC NHẬN ĐẶT VÉ</button>
@@ -195,11 +202,8 @@ try {
             currentTourPrice = price;
             document.getElementById('modal_tour_id').value = id;
             document.getElementById('modal_tour_name').innerText = name;
-            
-            // Reset dropdown về mặc định
             document.getElementById('discount_select').value = "0";
             document.getElementById('hidden_ma_khuyen_mai').value = "";
-            
             updateDisplay();
             document.getElementById('bookingModal').style.display = 'flex';
         }
@@ -215,29 +219,20 @@ try {
         function calculateTotal() { updateDisplay(); }
 
         function updateDisplay() {
-            // Lấy thẻ select
             let selectBox = document.getElementById('discount_select');
-            
-            // Lấy option đang được chọn
             let selectedOption = selectBox.options[selectBox.selectedIndex];
-            
-            // Lấy ID mã giảm giá từ attribute data-id và gán vào input hidden
             let codeId = selectedOption.getAttribute('data-id');
             document.getElementById('hidden_ma_khuyen_mai').value = codeId;
 
-            // Tính toán tiền
-            let discountPercent = parseInt(selectBox.value); // Lấy value (là % giảm)
+            let discountPercent = parseInt(selectBox.value);
             let discountAmount = currentTourPrice * (discountPercent / 100);
             let totalAmount = currentTourPrice - discountAmount;
             
-            // Format tiền tệ
             let fmt = new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' });
-
             document.getElementById('modal_tour_price').innerText = fmt.format(currentTourPrice);
             document.getElementById('discount_amount').innerText = "- " + fmt.format(discountAmount);
             document.getElementById('modal_tour_total').innerText = fmt.format(totalAmount);
         }
     </script>
-
 </body>
 </html>
