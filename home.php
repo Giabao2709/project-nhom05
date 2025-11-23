@@ -1,21 +1,34 @@
 <?php
 session_start();
+
+// 1. KẾT NỐI CSDL (QUAN TRỌNG NHẤT - KHÔNG ĐƯỢC QUÊN)
 require_once 'config/db.php';
 
-// Kiểm tra session
+// 2. LOGIC KIỂM TRA ĐĂNG NHẬP
 $is_logged_in = false;
 $user_name = "Khách";
 
+// Kiểm tra session khách hàng (Ưu tiên client_name, dự phòng kh_name)
 if (isset($_SESSION['client_name']) && !empty($_SESSION['client_name'])) {
     $is_logged_in = true;
     $user_name = $_SESSION['client_name'];
-} 
+} elseif (isset($_SESSION['kh_name']) && !empty($_SESSION['kh_name'])) {
+    $is_logged_in = true;
+    $user_name = $_SESSION['kh_name'];
+}
+
+// 3. LẤY DANH SÁCH TOUR TỪ CSDL
+$tours = [];
+$error_db = "";
 
 try {
+    // Lấy 6 tour mới nhất để hiển thị
     $sql = "SELECT * FROM tourdl ORDER BY id DESC LIMIT 6";
     $stmt = $pdo->query($sql);
     $tours = $stmt->fetchAll(PDO::FETCH_ASSOC);
-} catch (PDOException $e) { $tours = []; }
+} catch (PDOException $e) {
+    $error_db = "Lỗi kết nối: " . $e->getMessage();
+}
 ?>
 <!DOCTYPE html>
 <html lang="vi">
@@ -23,8 +36,10 @@ try {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Vivu Vietnam - Trải nghiệm sự khác biệt</title>
+    <!-- Font chữ & Icon -->
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <!-- CSS Chính -->
     <link rel="stylesheet" href="layouts/client_style.css">
     
     <!-- CSS RIÊNG CHO MODAL ĐĂNG NHẬP -->
@@ -64,6 +79,12 @@ try {
         }
         .close-btn:hover { color: #333; }
         .error-msg { color: red; background: #ffe4e6; padding: 10px; border-radius: 8px; margin-bottom: 20px; display: none; }
+        
+        .no-data {
+            grid-column: 1 / -1; text-align: center; padding: 50px;
+            background: #fff; border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        }
+        .no-data i { font-size: 3rem; color: #cbd5e1; margin-bottom: 15px; }
     </style>
 </head>
 <body>
@@ -85,7 +106,6 @@ try {
                 </span>
                 <a href="logout_client.php" class="btn-login btn-logout">Thoát</a>
             <?php else: ?>
-                <!-- Nút này bây giờ sẽ mở Popup thay vì chuyển trang -->
                 <a href="#" onclick="openLogin()" class="btn-login">Đăng Nhập</a>
             <?php endif; ?>
         </div>
@@ -107,6 +127,9 @@ try {
         <div class="section-header">
             <h2>TOUR DU LỊCH NỔI BẬT</h2>
             <div class="divider"></div>
+            <?php if (!empty($error_db)): ?>
+                <p style="color: red;">⚠️ <?php echo $error_db; ?></p>
+            <?php endif; ?>
         </div>
 
         <div class="tour-grid">
@@ -114,19 +137,33 @@ try {
                 <?php foreach ($tours as $tour): ?>
                     <div class="tour-card">
                         <div class="card-header">
-                            <?php $hinh = !empty($tour['hinh_anh']) ? "uploads/".$tour['hinh_anh'] : "https://source.unsplash.com/random/400x300/?travel"; ?>
+                            <?php 
+                                // Xử lý ảnh (ưu tiên ảnh thật, nếu không có thì dùng ảnh mẫu)
+                                $hinh = "https://source.unsplash.com/random/400x300/?travel"; 
+                                if (!empty($tour['hinh_anh']) && file_exists("uploads/".$tour['hinh_anh'])) {
+                                    $hinh = "uploads/".$tour['hinh_anh'];
+                                }
+                            ?>
                             <img src="<?php echo $hinh; ?>">
                             <span class="badge-hot">HOT</span>
                         </div>
                         <div class="card-body">
-                            <h3 class="tour-title"><?php echo $tour['ten_tour']; ?></h3>
+                            <h3 class="tour-title"><?php echo htmlspecialchars($tour['ten_tour']); ?></h3>
                             <div class="card-footer">
-                                <div class="price"><?php echo number_format($tour['gia'], 0, ',', '.'); ?> ₫</div>
+                                <div class="price">
+                                    <?php echo number_format($tour['gia'], 0, ',', '.'); ?> ₫
+                                </div>
                                 <a href="booking.php?id=<?php echo $tour['id']; ?>" class="btn-book">Chi tiết</a>
                             </div>
                         </div>
                     </div>
                 <?php endforeach; ?>
+            <?php else: ?>
+                <div class="no-data">
+                    <i class="fas fa-box-open"></i>
+                    <p>Chưa có tour nào được cập nhật.</p>
+                    <small>Hãy vào trang Admin thêm vài tour mới nhé!</small>
+                </div>
             <?php endif; ?>
         </div>
     </div>
@@ -137,10 +174,8 @@ try {
             <span class="close-btn" onclick="closeLogin()">&times;</span>
             <h2>Khách Hàng Đăng Nhập</h2>
             
-            <!-- Thông báo lỗi (nếu có) -->
             <div id="loginError" class="error-msg">Email hoặc mật khẩu không chính xác!</div>
 
-            <!-- FORM GỬI DỮ LIỆU SANG LOGIN_CLIENT.PHP -->
             <form action="login_client.php" method="POST">
                 <div class="input-group">
                     <input type="email" name="email" placeholder="Nhập Email (Ví dụ: khoa@gmail.com)" required>
@@ -157,19 +192,11 @@ try {
         </div>
     </div>
 
-    <!-- SCRIPT XỬ LÝ BẬT TẮT POPUP -->
+    <!-- SCRIPT -->
     <script>
-        // Mở popup
-        function openLogin() {
-            document.getElementById('loginModal').style.display = 'flex';
-        }
-
-        // Đóng popup
-        function closeLogin() {
-            document.getElementById('loginModal').style.display = 'none';
-        }
-
-        // Kiểm tra nếu URL có lỗi login thì mở popup và báo lỗi ngay
+        function openLogin() { document.getElementById('loginModal').style.display = 'flex'; }
+        function closeLogin() { document.getElementById('loginModal').style.display = 'none'; }
+        
         const urlParams = new URLSearchParams(window.location.search);
         if (urlParams.has('login_error')) {
             openLogin();
