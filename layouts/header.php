@@ -15,6 +15,8 @@ $ten_nguoi_dung = $_SESSION['user_name'] ?? 'Admin';
 <!DOCTYPE html>
 <html lang="vi">
 <head>
+    <!-- Nhúng file CSS giao diện chính -->
+<link rel="stylesheet" href="layouts/style.css">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0"> <meta http-equiv="X-UA-Compatible" content="ie=edge">
     
