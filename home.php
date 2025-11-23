@@ -1,17 +1,21 @@
 <?php
 session_start();
-// 1. KẾT NỐI CSDL (QUAN TRỌNG: Phải có đoạn này mới không bị lỗi $tours)
 require_once 'config/db.php';
 
+// Kiểm tra session
+$is_logged_in = false;
+$user_name = "Khách";
+
+if (isset($_SESSION['client_name']) && !empty($_SESSION['client_name'])) {
+    $is_logged_in = true;
+    $user_name = $_SESSION['client_name'];
+} 
+
 try {
-    // 2. Lấy danh sách 6 tour mới nhất
     $sql = "SELECT * FROM tourdl ORDER BY id DESC LIMIT 6";
     $stmt = $pdo->query($sql);
     $tours = $stmt->fetchAll(PDO::FETCH_ASSOC);
-} catch (PDOException $e) {
-    $tours = []; // Nếu lỗi thì gán mảng rỗng để web không bị chết
-    echo "Lỗi kết nối: " . $e->getMessage();
-}
+} catch (PDOException $e) { $tours = []; }
 ?>
 <!DOCTYPE html>
 <html lang="vi">
@@ -19,38 +23,75 @@ try {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Vivu Vietnam - Trải nghiệm sự khác biệt</title>
-    
-    <!-- 3. Nhúng Font chữ Google (Poppins) cho đẹp -->
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
-    
-    <!-- 4. Nhúng Icon và CSS -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="layouts/client_style.css">
+    
+    <!-- CSS RIÊNG CHO MODAL ĐĂNG NHẬP -->
+    <style>
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.6); z-index: 2000;
+            display: none; justify-content: center; align-items: center;
+            backdrop-filter: blur(5px);
+        }
+        .login-popup {
+            background: white; width: 400px; padding: 40px;
+            border-radius: 20px; text-align: center;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.3);
+            position: relative; animation: slideDown 0.4s ease;
+        }
+        @keyframes slideDown { from {transform: translateY(-50px); opacity: 0;} to {transform: translateY(0); opacity: 1;} }
+        
+        .login-popup h2 { color: #333; margin-bottom: 30px; font-size: 1.8rem; }
+        .input-group { margin-bottom: 20px; text-align: left; }
+        .input-group input {
+            width: 100%; padding: 15px; border: 2px solid #eee;
+            border-radius: 10px; font-size: 1rem; outline: none; transition: 0.3s;
+        }
+        .input-group input:focus { border-color: #0ea5e9; background: #f0f9ff; }
+        
+        .btn-submit {
+            width: 100%; padding: 15px; background: #f43f5e; color: white;
+            border: none; border-radius: 10px; font-size: 1.1rem; font-weight: bold;
+            cursor: pointer; transition: 0.3s; box-shadow: 0 5px 15px rgba(244, 63, 94, 0.4);
+        }
+        .btn-submit:hover { background: #e11d48; transform: scale(1.02); }
+        
+        .close-btn {
+            position: absolute; top: 15px; right: 20px; font-size: 2rem;
+            color: #999; cursor: pointer;
+        }
+        .close-btn:hover { color: #333; }
+        .error-msg { color: red; background: #ffe4e6; padding: 10px; border-radius: 8px; margin-bottom: 20px; display: none; }
+    </style>
 </head>
 <body>
 
-    <!-- THANH MENU (NAVBAR) -->
+    <!-- THANH MENU -->
     <nav class="navbar">
         <div class="logo">VIVU VIETNAM <i class="fas fa-paper-plane"></i></div>
         <div class="menu">
-            <a href="#">Trang Chủ</a>
+            <a href="home.php">Trang Chủ</a>
             <a href="#tour-hot">Tour Hot</a>
             <a href="#">Tin Tức</a>
             <a href="#">Liên Hệ</a>
         </div>
         
-        <!-- Kiểm tra nếu khách đã đăng nhập -->
-        <?php if (isset($_SESSION['user_name'])): ?>
-             <div class="user-action">
-                <span style="color:white; margin-right: 10px;">Xin chào, <?php echo $_SESSION['user_name']; ?></span>
+        <div class="user-action">
+            <?php if ($is_logged_in): ?>
+                <span style="color: white; font-weight: 600; margin-right: 15px;">
+                    <i class="fas fa-user-circle"></i> Xin chào, <?php echo htmlspecialchars($user_name); ?>
+                </span>
                 <a href="logout_client.php" class="btn-login btn-logout">Thoát</a>
-             </div>
-        <?php else: ?>
-            <a href="login_client.php" class="btn-login">Đăng Nhập</a>
-        <?php endif; ?>
+            <?php else: ?>
+                <!-- Nút này bây giờ sẽ mở Popup thay vì chuyển trang -->
+                <a href="#" onclick="openLogin()" class="btn-login">Đăng Nhập</a>
+            <?php endif; ?>
+        </div>
     </nav>
 
-    <!-- HERO BANNER (PHẦN BÌA ĐẦU TRANG) -->
+    <!-- HERO BANNER -->
     <div class="hero-banner">
         <div class="overlay"></div>
         <div class="hero-content">
@@ -66,7 +107,6 @@ try {
         <div class="section-header">
             <h2>TOUR DU LỊCH NỔI BẬT</h2>
             <div class="divider"></div>
-            <p>Những chuyến đi được yêu thích nhất mùa hè này</p>
         </div>
 
         <div class="tour-grid">
@@ -74,52 +114,68 @@ try {
                 <?php foreach ($tours as $tour): ?>
                     <div class="tour-card">
                         <div class="card-header">
-                            <?php 
-                                $hinh = !empty($tour['hinh_anh']) ? "uploads/".$tour['hinh_anh'] : "https://source.unsplash.com/random/400x300/?travel"; 
-                            ?>
-                            <img src="<?php echo $hinh; ?>" alt="<?php echo $tour['ten_tour']; ?>">
+                            <?php $hinh = !empty($tour['hinh_anh']) ? "uploads/".$tour['hinh_anh'] : "https://source.unsplash.com/random/400x300/?travel"; ?>
+                            <img src="<?php echo $hinh; ?>">
                             <span class="badge-hot">HOT</span>
                         </div>
                         <div class="card-body">
-                            <div class="card-meta">
-                                <span><i class="far fa-clock"></i> 3 Ngày 2 Đêm</span>
-                                <span><i class="fas fa-user-friends"></i> 20 chỗ</span>
-                            </div>
                             <h3 class="tour-title"><?php echo $tour['ten_tour']; ?></h3>
                             <div class="card-footer">
-                                <div class="price">
-                                    <span class="currency">₫</span>
-                                    <?php echo number_format($tour['gia'], 0, ',', '.'); ?>
-                                </div>
-                                <a href="booking.php?id=<?php echo $tour['id']; ?>" class="btn-book">Chi tiết <i class="fas fa-angle-right"></i></a>
+                                <div class="price"><?php echo number_format($tour['gia'], 0, ',', '.'); ?> ₫</div>
+                                <a href="booking.php?id=<?php echo $tour['id']; ?>" class="btn-book">Chi tiết</a>
                             </div>
                         </div>
                     </div>
                 <?php endforeach; ?>
-            <?php else: ?>
-                <div class="no-data">
-                    <i class="fas fa-box-open"></i>
-                    <p>Chưa có tour nào được cập nhật.</p>
-                </div>
             <?php endif; ?>
         </div>
     </div>
 
-    <!-- FOOTER -->
-    <footer>
-        <div class="footer-content">
-            <h3>Vivu Vietnam</h3>
-            <p>Hệ thống đặt tour du lịch uy tín hàng đầu.</p>
-            <ul class="socials">
-                <li><a href="#"><i class="fab fa-facebook"></i></a></li>
-                <li><a href="#"><i class="fab fa-twitter"></i></a></li>
-                <li><a href="#"><i class="fab fa-instagram"></i></a></li>
-            </ul>
+    <!-- POPUP ĐĂNG NHẬP (MODAL) -->
+    <div class="modal-overlay" id="loginModal">
+        <div class="login-popup">
+            <span class="close-btn" onclick="closeLogin()">&times;</span>
+            <h2>Khách Hàng Đăng Nhập</h2>
+            
+            <!-- Thông báo lỗi (nếu có) -->
+            <div id="loginError" class="error-msg">Email hoặc mật khẩu không chính xác!</div>
+
+            <!-- FORM GỬI DỮ LIỆU SANG LOGIN_CLIENT.PHP -->
+            <form action="login_client.php" method="POST">
+                <div class="input-group">
+                    <input type="email" name="email" placeholder="Nhập Email (Ví dụ: khoa@gmail.com)" required>
+                </div>
+                <div class="input-group">
+                    <input type="password" name="password" placeholder="Mật khẩu" required>
+                </div>
+                <button type="submit" class="btn-submit">Đăng Nhập</button>
+            </form>
+            
+            <p style="margin-top: 20px; font-size: 0.9rem;">
+                Chưa có tài khoản? <a href="register_client.php" style="color: #0ea5e9;">Đăng ký ngay</a>
+            </p>
         </div>
-        <div class="footer-bottom">
-            <p>&copy; 2025 Project Nhom 05. All rights reserved.</p>
-        </div>
-    </footer>
+    </div>
+
+    <!-- SCRIPT XỬ LÝ BẬT TẮT POPUP -->
+    <script>
+        // Mở popup
+        function openLogin() {
+            document.getElementById('loginModal').style.display = 'flex';
+        }
+
+        // Đóng popup
+        function closeLogin() {
+            document.getElementById('loginModal').style.display = 'none';
+        }
+
+        // Kiểm tra nếu URL có lỗi login thì mở popup và báo lỗi ngay
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.has('login_error')) {
+            openLogin();
+            document.getElementById('loginError').style.display = 'block';
+        }
+    </script>
 
 </body>
 </html>
