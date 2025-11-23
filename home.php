@@ -1,14 +1,16 @@
 <?php
 session_start();
+// 1. KẾT NỐI CSDL (QUAN TRỌNG: Phải có đoạn này mới không bị lỗi $tours)
 require_once 'config/db.php';
 
-// Lấy danh sách Tour từ CSDL (Giới hạn 6 tour mới nhất)
 try {
+    // 2. Lấy danh sách 6 tour mới nhất
     $sql = "SELECT * FROM tourdl ORDER BY id DESC LIMIT 6";
     $stmt = $pdo->query($sql);
     $tours = $stmt->fetchAll(PDO::FETCH_ASSOC);
 } catch (PDOException $e) {
-    echo "Lỗi: " . $e->getMessage();
+    $tours = []; // Nếu lỗi thì gán mảng rỗng để web không bị chết
+    echo "Lỗi kết nối: " . $e->getMessage();
 }
 ?>
 <!DOCTYPE html>
@@ -16,77 +18,107 @@ try {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Trang Chủ - Vivu Vietnam</title>
-    <!-- Nhúng file CSS mới tạo -->
-    <link rel="stylesheet" href="layouts/client_style.css">
-    <!-- Nhúng Font Awesome để có icon đẹp -->
+    <title>Vivu Vietnam - Trải nghiệm sự khác biệt</title>
+    
+    <!-- 3. Nhúng Font chữ Google (Poppins) cho đẹp -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    
+    <!-- 4. Nhúng Icon và CSS -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="layouts/client_style.css">
 </head>
 <body>
 
-    <!-- Header / Menu (Giữ nguyên hoặc include file header của bạn) -->
-    <?php include 'layouts/header_client.php'; // Hoặc file header bạn đang dùng ?>
+    <!-- THANH MENU (NAVBAR) -->
+    <nav class="navbar">
+        <div class="logo">VIVU VIETNAM <i class="fas fa-paper-plane"></i></div>
+        <div class="menu">
+            <a href="#">Trang Chủ</a>
+            <a href="#tour-hot">Tour Hot</a>
+            <a href="#">Tin Tức</a>
+            <a href="#">Liên Hệ</a>
+        </div>
+        
+        <!-- Kiểm tra nếu khách đã đăng nhập -->
+        <?php if (isset($_SESSION['user_name'])): ?>
+             <div class="user-action">
+                <span style="color:white; margin-right: 10px;">Xin chào, <?php echo $_SESSION['user_name']; ?></span>
+                <a href="logout_client.php" class="btn-login btn-logout">Thoát</a>
+             </div>
+        <?php else: ?>
+            <a href="login_client.php" class="btn-login">Đăng Nhập</a>
+        <?php endif; ?>
+    </nav>
 
-    <!-- HERO SECTION (BANNER) -->
+    <!-- HERO BANNER (PHẦN BÌA ĐẦU TRANG) -->
     <div class="hero-banner">
+        <div class="overlay"></div>
         <div class="hero-content">
-            <h1>Khám Phá Vẻ Đẹp Việt Nam</h1>
-            <p>Hơn 1000+ tour du lịch hấp dẫn đang chờ đón bạn trải nghiệm</p>
-            <a href="#tour-list" class="btn-explore">Đặt Tour Ngay <i class="fas fa-arrow-right"></i></a>
+            <span class="subtitle">Khám phá vẻ đẹp bất tận</span>
+            <h1>VIỆT NAM TRONG TẦM TAY</h1>
+            <p>Hơn 500+ điểm đến hấp dẫn đang chờ bạn trải nghiệm ngay hôm nay.</p>
+            <a href="#tour-hot" class="btn-explore">Đặt Tour Ngay <i class="fas fa-arrow-down"></i></a>
         </div>
     </div>
 
-    <!-- DANH SÁCH TOUR (GRID VIEW) -->
-    <div id="tour-list" class="container">
-        
-        <div class="section-title">
-            <h2>Tour Du Lịch Nổi Bật</h2>
+    <!-- DANH SÁCH TOUR -->
+    <div id="tour-hot" class="container">
+        <div class="section-header">
+            <h2>TOUR DU LỊCH NỔI BẬT</h2>
+            <div class="divider"></div>
+            <p>Những chuyến đi được yêu thích nhất mùa hè này</p>
         </div>
 
-        <div class="tour-container">
-            <?php if ($tours): ?>
+        <div class="tour-grid">
+            <?php if (!empty($tours)): ?>
                 <?php foreach ($tours as $tour): ?>
                     <div class="tour-card">
-                        <div class="tour-img">
-                            <!-- Nếu có ảnh thì hiện, không thì hiện ảnh mặc định -->
+                        <div class="card-header">
                             <?php 
-                                $imgSrc = !empty($tour['hinh_anh']) ? "uploads/" . $tour['hinh_anh'] : "https://via.placeholder.com/400x250"; 
+                                $hinh = !empty($tour['hinh_anh']) ? "uploads/".$tour['hinh_anh'] : "https://source.unsplash.com/random/400x300/?travel"; 
                             ?>
-                            <img src="<?php echo $imgSrc; ?>" alt="<?php echo $tour['ten_tour']; ?>">
-                            <span class="tour-price-badge">-10%</span> <!-- Ví dụ badge giảm giá -->
+                            <img src="<?php echo $hinh; ?>" alt="<?php echo $tour['ten_tour']; ?>">
+                            <span class="badge-hot">HOT</span>
                         </div>
-                        
-                        <div class="tour-content">
+                        <div class="card-body">
+                            <div class="card-meta">
+                                <span><i class="far fa-clock"></i> 3 Ngày 2 Đêm</span>
+                                <span><i class="fas fa-user-friends"></i> 20 chỗ</span>
+                            </div>
                             <h3 class="tour-title"><?php echo $tour['ten_tour']; ?></h3>
-                            
-                            <div class="tour-info">
-                                <span><i class="far fa-clock"></i> 3 Ngày 2 Đêm</span> <!-- Ví dụ -->
-                                <span><i class="fas fa-user-friends"></i> Còn trống</span>
-                            </div>
-
-                            <div style="display: flex; justify-content: space-between; align-items: center;">
-                                <div class="tour-price">
-                                    <?php echo number_format($tour['gia'], 0, ',', '.'); ?> đ
+                            <div class="card-footer">
+                                <div class="price">
+                                    <span class="currency">₫</span>
+                                    <?php echo number_format($tour['gia'], 0, ',', '.'); ?>
                                 </div>
+                                <a href="booking.php?id=<?php echo $tour['id']; ?>" class="btn-book">Chi tiết <i class="fas fa-angle-right"></i></a>
                             </div>
-
-                            <a href="booking.php?id=<?php echo $tour['id']; ?>" class="btn-book">
-                                <i class="fas fa-ticket-alt"></i> Đặt Vé Ngay
-                            </a>
                         </div>
                     </div>
                 <?php endforeach; ?>
             <?php else: ?>
-                <p style="text-align: center; width: 100%;">Chưa có tour nào được cập nhật.</p>
+                <div class="no-data">
+                    <i class="fas fa-box-open"></i>
+                    <p>Chưa có tour nào được cập nhật.</p>
+                </div>
             <?php endif; ?>
         </div>
-
     </div>
 
     <!-- FOOTER -->
-    <footer class="client-footer">
-        <p>© 2025 Vivu Vietnam - Hệ thống đặt tour du lịch hàng đầu.</p>
-        <p>Nhóm 05 - Lập trình Web</p>
+    <footer>
+        <div class="footer-content">
+            <h3>Vivu Vietnam</h3>
+            <p>Hệ thống đặt tour du lịch uy tín hàng đầu.</p>
+            <ul class="socials">
+                <li><a href="#"><i class="fab fa-facebook"></i></a></li>
+                <li><a href="#"><i class="fab fa-twitter"></i></a></li>
+                <li><a href="#"><i class="fab fa-instagram"></i></a></li>
+            </ul>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2025 Project Nhom 05. All rights reserved.</p>
+        </div>
     </footer>
 
 </body>
